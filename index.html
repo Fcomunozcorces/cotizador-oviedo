@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotizador Oviedo Ferreterías</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23FF0A00'/><text x='16' y='22' font-size='18' font-weight='900' text-anchor='middle' fill='white'>O</text></svg>">
+<style>
+:root{--red:#FF0A00;--black:#000;--dark:#1a1a1a;--gray:#666;--lightgray:#f5f5f5;--border:#e5e5e5}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:#f8f8f8;color:var(--dark);direction:ltr;text-align:left}
+.header{background:#fff;border-bottom:3px solid var(--red);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px #0001;flex-wrap:wrap;gap:8px}
+.header img{height:42px}
+.header-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge{font-size:11px;color:var(--gray);background:var(--lightgray);padding:3px 10px;border-radius:6px}
+input[type=text],input[type=number],input[type=password]{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff;direction:ltr;text-align:left}
+input[type=text]:focus,input[type=number]:focus{outline:2px solid var(--red);border-color:transparent}
+textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;line-height:1.5}
+textarea:focus{outline:2px solid var(--red);border-color:transparent}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .1s,opacity .15s}
+.btn:active{transform:scale(.97)}
+.btn-red{background:var(--red);color:#fff}
+.btn-black{background:var(--black);color:#fff}
+.btn-ghost{background:#fff;color:var(--dark);border:1px solid var(--border)}
+.btn-green{background:#16a34a;color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:16px}
+.card-head{padding:14px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.card-body{padding:16px 20px}
+.tabs{display:flex;border-bottom:1px solid var(--border)}
+.tab{flex:1;padding:10px 0;border:none;background:transparent;color:var(--gray);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.tab.active{color:var(--red);border-bottom:2px solid var(--red);background:#fff5f5}
+.drop-area{padding:30px;text-align:center;border:2px dashed var(--border);border-radius:8px;background:var(--lightgray)}
+table{width:100%;border-collapse:collapse}
+th{background:var(--black);color:#fff;padding:9px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;text-align:left;white-space:nowrap}
+th.r{text-align:right}
+th.c{text-align:center}
+td{padding:7px 10px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:top}
+td.r{text-align:right;font-family:'Courier New',monospace;white-space:nowrap}
+td.c{text-align:center}
+td.mono{font-family:'Courier New',monospace;font-size:11px;color:var(--gray)}
+tr.alt{background:var(--lightgray)}
+tr.sel{background:#fff5f5}
+tr.clickable{cursor:pointer;transition:background .1s}
+tr.clickable:hover{background:#fef2f2}
+tr.no-match{background:#fef2f2}
+.conf{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;text-transform:uppercase}
+.conf-alta{background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0}
+.conf-media{background:#fef9c3;color:#ca8a04;border:1px solid #fde68a}
+.conf-baja{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
+.note{font-size:10px;color:var(--gray);margin-top:3px;line-height:1.2}
+.total-row{background:var(--red)}
+.total-row td{color:#fff;font-weight:800;font-size:14px;padding:10px}
+.cs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.cs-card{padding:14px;background:var(--lightgray);border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .15s;position:relative}
+.cs-card.selected{border:2px solid var(--red);background:#fff5f5}
+.cs-card .check{position:absolute;top:8px;right:10px;font-size:16px;color:var(--red)}
+.export-bar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:20px 0}
+.container{max-width:1100px;margin:0 auto;padding:16px 20px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #fff4;border-top-color:#fff;border-radius:50%;animation:spin .5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.step-text{font-size:13px;margin-left:8px}
+.margen-ctrl{display:flex;align-items:center;gap:6px}
+.margen-ctrl label{font-size:13px;color:var(--gray)}
+.margen-ctrl input{width:62px;text-align:center;font-weight:700;font-size:15px;color:var(--red)}
+.admin-overlay{position:fixed;inset:0;background:#000a;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.admin-panel{background:#fff;border-radius:14px;padding:28px;max-width:500px;width:100%;box-shadow:0 20px 60px #0003}
+.stat{text-align:center}.stat-num{font-size:24px;font-weight:800;color:var(--red)}.stat-label{font-size:11px;color:var(--gray)}
+.hist-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.photo-preview{max-height:160px;border-radius:8px;margin-bottom:12px}
+.section-marker{width:4px;height:18px;background:var(--red);border-radius:2px;display:inline-block;margin-right:8px;vertical-align:middle}
+/* PDF view */
+.pdf-overlay{position:fixed;inset:0;z-index:200;background:#fff;overflow-y:auto}
+.pdf-toolbar{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:10px 24px;background:#fff;border-bottom:3px solid var(--red);box-shadow:0 2px 8px #0001}
+.pdf-body{max-width:800px;margin:0 auto;padding:24px 28px}
+@media(max-width:600px){.header{padding:10px 12px}.container{padding:12px}.card-body{padding:12px}th,td{padding:5px 6px;font-size:10px}}
+@media print{.pdf-toolbar{display:none!important}.pdf-body{padding:20px!important}}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// ============================================
+// COTIZADOR OVIEDO - Standalone Web App
+// ============================================
+
+const LOGO_B64 = "data:image/png;base64,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";
+const MARGEN_DEFAULT = 35;
+const IVA = 0.19;
+const ADMIN_PASS = "oviedo2026";
+const API_MODEL = "claude-sonnet-4-20250514";
+
+
+// ── State ──
+let products = [];
+let results = null;
+let crossSell = [];
+let sel = {};
+let selCross = {};
+let selProd = {}; // tracks which product rows are included in quote
+let manualProds = []; // manually added products [{p: product, cant: 1}]
+let addSearch = ""; // search query for adding products
+let addResults = []; // search results for adding
+let margen = MARGEN_DEFAULT;
+let rowMargen = {}; // per-row margin overrides: key "idx-ai" => margin %
+let rowDesc = {}; // per-row discount %: key "idx-ai" => discount %
+let rowDescM = {}; // per-row discount $ override: key "idx-ai" => discount $
+let rowCant = {}; // per-row quantity override: key "idx-ai" => qty
+let csMargen = {}; // per cross-sell margin: key i => margin %
+let csDesc = {}; // per cross-sell discount %
+let csDescM = {}; // per cross-sell discount $ override
+let csCant = {}; // per cross-sell quantity: key i => qty
+let vendedor = localStorage.getItem("ov_vendedor") || "";
+let clienteNombre = "";
+let clienteRut = "";
+let clienteEmail = "";
+let clienteTelefono = "";
+let hist = JSON.parse(localStorage.getItem("ov_hist") || "[]");
+let inputMode = "text";
+let clientText = "";
+let busy = false;
+let stepText = "";
+let showPDF = false;
+let showAdmin = false;
+let showHist = false;
+let photoPreview = null;
+let apiKey = localStorage.getItem("ov_apikey") || "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";
+
+// ── Helpers ──
+const norm = t => (t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g," ").trim();
+const tokenize = t => norm(t).split(/\s+/).filter(w=>w.length>1);
+const fmt = n => `$${Math.round(n).toLocaleString("es-CL")}`;
+const pNet = (c,m) => Math.round(c/(1-m/100));
+const pIva = (c,m) => Math.round(pNet(c,m)*(1+IVA));
+const getMargen = (key) => rowMargen[key]!==undefined?rowMargen[key]:margen;
+const getCsMargen = (i) => csMargen[i]!==undefined?csMargen[i]:margen;
+const getDesc = (key) => rowDesc[key]||0;
+const getDescM = (key) => rowDescM[key]!==undefined?rowDescM[key]:null;
+const getCsDesc = (i) => csDesc[i]||0;
+const getCsDescM = (i) => csDescM[i]!==undefined?csDescM[i]:null;
+const getCant = (key,def) => rowCant[key]!==undefined?rowCant[key]:def;
+const getCsCant = (i) => csCant[i]!==undefined?csCant[i]:1;
+// calcLine: if descMontoFixed is set, use it; otherwise use desc%
+const calcLine = (costo,m,descPct,descMontoFixed,cant) => {
+  const neto=pNet(costo,m);
+  const descMonto=descMontoFixed!==null?descMontoFixed:Math.round(neto*descPct/100);
+  const descPctEff=neto>0?Math.round(descMonto/neto*100*10)/10:0;
+  const netoFinal=neto-descMonto;
+  const iva=Math.round(netoFinal*(1+IVA));
+  return {neto,descPct:descPctEff,descMonto,netoFinal,iva,totalNeto:netoFinal*cant,totalIva:iva*cant};
+};
+const P = {SKU:0,DESC:1,MARCA:2,COSTO:3,FAM:4,SUBFAM:5};
+
+function scoreMatch(p,tokens){
+  const txt=norm(`${p[1]} ${p[2]} ${p[4]} ${p[5]}`);
+  const words=txt.split(/\s+/);
+  let score=0,matched=0;
+  for(const tk of tokens){if(txt.includes(tk)){matched++;score+=words.includes(tk)?3:1;if(norm(p[1]).includes(tk))score+=2;}}
+  return matched>=Math.ceil(tokens.length*0.25)?score*(matched/tokens.length):0;
+}
+
+function localSearch(query,max=20){
+  const tokens=tokenize(query);
+  if(!tokens.length)return[];
+  return products.map(p=>[p,scoreMatch(p,tokens)]).filter(([,s])=>s>0).sort((a,b)=>b[1]-a[1]).slice(0,max).map(([p])=>p);
+}
+
+// Quick search for add-product (also matches SKU directly)
+function quickSearch(query,max=8){
+  if(!query||query.length<2)return[];
+  const q=query.trim();
+  // Exact SKU match first
+  const skuMatch=products.filter(p=>String(p[P.SKU]).toLowerCase()===q.toLowerCase());
+  if(skuMatch.length)return skuMatch.slice(0,max);
+  // SKU starts with
+  const skuStarts=products.filter(p=>String(p[P.SKU]).toLowerCase().startsWith(q.toLowerCase())).slice(0,3);
+  // Text search
+  const textResults=localSearch(q,max);
+  // Merge, dedupe
+  const seen=new Set();
+  const merged=[];
+  for(const p of [...skuStarts,...textResults]){
+    if(!seen.has(p[P.SKU])){seen.add(p[P.SKU]);merged.push(p);}
+    if(merged.length>=max)break;
+  }
+  return merged;
+}
+
+function updateSearchDropdown(){
+  const dd=document.getElementById("searchDropdown");
+  if(!dd)return;
+  if(!addResults.length){dd.innerHTML="";dd.style.display="none";return;}
+  dd.style.display="block";
+  dd.innerHTML=addResults.map(p=>`<div onclick="addManualProduct(products.find(x=>String(x[0])==='${String(p[P.SKU]).replace(/'/g,"\\'")}'))" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s;display:flex;justify-content:space-between;align-items:center" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='#fff'"><div><span class="mono" style="color:var(--red);font-size:11px;margin-right:8px">${p[P.SKU]}</span><span style="font-size:12px">${p[P.DESC]}</span><span style="font-size:10px;color:var(--gray);margin-left:8px">${p[P.MARCA]}</span></div><span style="font-size:12px;font-weight:600;white-space:nowrap">${fmt(p[P.COSTO])}</span></div>`).join("");
+}
+
+function addManualProduct(prod){
+  manualProds.push({p:prod,cant:1});
+  // Auto-select it
+  const key="m-"+(manualProds.length-1);
+  selProd[key]=true;
+  addSearch="";addResults=[];
+  render();
+}
+
+function removeManualProduct(idx){
+  const key="m-"+idx;
+  delete selProd[key];delete rowMargen[key];delete rowDesc[key];delete rowDescM[key];delete rowCant[key];
+  manualProds.splice(idx,1);
+  // Re-index keys for products after this one
+  const newSelProd={},newRowMargen={},newRowDesc={},newRowCant={};
+  Object.entries(selProd).forEach(([k,v])=>{
+    if(k.startsWith("m-")){const i=+k.split("-")[1];if(i>idx)newSelProd["m-"+(i-1)]=v;else if(i<idx)newSelProd[k]=v;}else newSelProd[k]=v;
+  });
+  Object.entries(rowMargen).forEach(([k,v])=>{
+    if(k.startsWith("m-")){const i=+k.split("-")[1];if(i>idx)newRowMargen["m-"+(i-1)]=v;else if(i<idx)newRowMargen[k]=v;}else newRowMargen[k]=v;
+  });
+  Object.entries(rowDesc).forEach(([k,v])=>{
+    if(k.startsWith("m-")){const i=+k.split("-")[1];if(i>idx)newRowDesc["m-"+(i-1)]=v;else if(i<idx)newRowDesc[k]=v;}else newRowDesc[k]=v;
+  });
+  Object.entries(rowCant).forEach(([k,v])=>{
+    if(k.startsWith("m-")){const i=+k.split("-")[1];if(i>idx)newRowCant["m-"+(i-1)]=v;else if(i<idx)newRowCant[k]=v;}else newRowCant[k]=v;
+  });
+  selProd=newSelProd;rowMargen=newRowMargen;rowDesc=newRowDesc;rowCant=newRowCant;
+  render();
+}
+
+// ── Claude API ──
+async function askClaude(system,user){
+  const r=await fetch("/.netlify/functions/claude",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:API_MODEL,max_tokens:4000,system,messages:[{role:"user",content:typeof user==="string"?user:user}]})
+  });
+  const d=await r.json();
+  if(d.error){alert("API Error: "+d.error.message);return"";}
+  return(d.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+}
+
+function parseJSON(raw){
+  try{return JSON.parse(raw.replace(/```json\s*/g,"").replace(/```/g,"").trim());}catch{return null;}
+}
+
+// ── Load products ──
+async function loadProducts(){
+  // Try localStorage first
+  const cached=localStorage.getItem("ov_prods_ver");
+  if(cached){
+    try{
+      products=JSON.parse(localStorage.getItem("ov_prods"));
+      if(products&&products.length>0){render();return;}
+    }catch{}
+  }
+  // Fetch from products.json
+  try{
+    const r=await fetch("products.json");
+    const data=await r.json();
+    products=data;
+    localStorage.setItem("ov_prods",JSON.stringify(data));
+    localStorage.setItem("ov_prods_ver",new Date().toISOString());
+  }catch(e){console.error("No products.json found",e);}
+  render();
+}
+
+// ── Main process ──
+async function processQuote(){
+  if(!clientText.trim()||busy)return;
+  busy=true;results=null;crossSell=[];sel={};selCross={};selProd={};rowMargen={};rowDesc={};rowDescM={};rowCant={};csMargen={};csDesc={};csDescM={};csCant={};manualProds=[];addSearch="";addResults=[];render();
+
+  try{
+    stepText="Identificando productos...";render();
+    const parsed=parseJSON(await askClaude("Extrae cada producto del texto. JSON sin markdown: [{\"item\":\"desc\",\"cantidad\":n_or_null}]",clientText));
+    const items=parsed||clientText.split("\n").filter(l=>l.trim()).map(l=>({item:l.trim(),cantidad:null}));
+
+    stepText=`Buscando en catálogo (${items.length} productos)...`;render();
+    const candidates=items.map(ci=>localSearch(ci.item,15));
+
+    stepText="Análisis con IA...";render();
+    const matchPrompt=`Eres asistente de cotización de Ferretería Oviedo (Chile).
+Para cada producto del cliente, selecciona 1-3 mejores alternativas del catálogo.
+Considera medidas, materiales, marcas y specs. Si no hay match razonable, sin_match:true.
+RESPONDE SOLO JSON (sin markdown):
+[{"cliente_item":"...", "cantidad":n, "alternativas":[{"sku":"...","confianza":"alta|media|baja","nota":"..."}], "sin_match":false}]`;
+
+    const matchUser=`PRODUCTOS DEL CLIENTE:\n${items.map((it,i)=>`${i+1}. ${it.cantidad?it.cantidad+"x ":""}${it.item}`).join("\n")}\n\nCANDIDATOS:\n${candidates.map((cs,i)=>`\n--- #${i+1}: "${items[i].item}" ---\n${cs.map(c=>`SKU:${c[P.SKU]} | ${c[P.DESC]} | ${c[P.MARCA]} | ${c[P.FAM]} | $${c[P.COSTO]}`).join("\n")}`).join("\n")}`;
+
+    const matches=parseJSON(await askClaude(matchPrompt,matchUser));
+    if(!matches){alert("Error en análisis. Reintente.");busy=false;stepText="";render();return;}
+
+    results=matches.map(m=>({...m,alternativas:(m.alternativas||[]).map(a=>{const prod=products.find(p=>p[P.SKU]===a.sku);return prod?{...a,p:prod}:null;}).filter(Boolean)}));
+    results.forEach((it,i)=>{if(it.alternativas.length){sel[i]=0;selProd[i+"-0"]=true;}});
+
+    // Cross-sell
+    stepText="Generando sugerencias...";render();
+    const matched=results.flatMap(it=>it.alternativas.map(a=>a.p)).filter(Boolean);
+    if(matched.length){
+      const matchedSkus=new Set(matched.map(p=>p[P.SKU]));
+      const matchedFams=[...new Set(matched.map(p=>p[P.FAM]))];
+      const RELATED={"GASFITERIA":["SILICONAS Y SELLANTES","GRIFERIA","FIJACIONES","HERRAMIENTAS MANUALES"],"PINTURA":["HERRAMIENTAS MANUALES","SILICONAS Y SELLANTES","CINTAS ADHESIVAS","QUIMICOS Y PEGAMENTOS"],"ILUMINACION Y ELECTRICIDAD":["HERRAMIENTAS MANUALES","FIJACIONES","CINTAS ADHESIVAS"],"HERRAMIENTAS ELECTRICAS":["ACCESORIOS PARA HERRAMIENTAS","SEGURIDAD","FIJACIONES"],"HERRAMIENTAS INALAMBRICAS":["ACCESORIOS PARA HERRAMIENTAS","SEGURIDAD","FIJACIONES"],"FIJACIONES":["HERRAMIENTAS MANUALES","HERRAMIENTAS ELECTRICAS","SILICONAS Y SELLANTES"],"TABIQUERIA Y REVESTIMIENTO":["FIJACIONES","PINTURA","HERRAMIENTAS MANUALES","SILICONAS Y SELLANTES"],"PISOS":["SILICONAS Y SELLANTES","QUIMICOS Y PEGAMENTOS","HERRAMIENTAS MANUALES"],"C. MATERIALES CONSTRUCCION":["FIJACIONES","HERRAMIENTAS MANUALES","HERRAMIENTAS CONSTRUCCION","SEGURIDAD"],"HERRAMIENTAS MANUALES":["SEGURIDAD","FIJACIONES","HERRAMIENTAS ELECTRICAS"],"SEGURIDAD":["HERRAMIENTAS MANUALES","HERRAMIENTAS ELECTRICAS"],"HERRAMIENTAS CONSTRUCCION":["SEGURIDAD","FIJACIONES","C. MATERIALES CONSTRUCCION"],"SOLDADORAS":["SEGURIDAD","ACCESORIOS PARA HERRAMIENTAS"],"TECHUMBRE Y AISLACION":["FIJACIONES","SILICONAS Y SELLANTES","HERRAMIENTAS MANUALES"],"GRIFERIA":["GASFITERIA","SILICONAS Y SELLANTES"],"ACCESORIOS PARA HERRAMIENTAS":["HERRAMIENTAS ELECTRICAS","HERRAMIENTAS INALAMBRICAS","SEGURIDAD"],"C. MATERIALES FERRETERIA":["FIJACIONES","HERRAMIENTAS MANUALES","SEGURIDAD"],"QUINCALLERIA Y CERRAJERIA":["HERRAMIENTAS MANUALES","FIJACIONES"],"HOGAR":["PINTURA","ILUMINACION Y ELECTRICIDAD"],"BOMBAS Y MOTORES":["GASFITERIA","HERRAMIENTAS MANUALES"],"GENERADORES Y COMPRESORES":["ACCESORIOS PARA HERRAMIENTAS","SEGURIDAD"]};
+      const relFams=new Set();matchedFams.forEach(f=>(RELATED[f]||[]).forEach(r=>relFams.add(r)));
+      // Fallback: if no related families found, suggest from SEGURIDAD + HERRAMIENTAS MANUALES
+      if(relFams.size===0){relFams.add("SEGURIDAD");relFams.add("HERRAMIENTAS MANUALES");relFams.add("FIJACIONES");}
+      const csCands=products.filter(p=>!matchedSkus.has(p[P.SKU])&&relFams.has(p[P.FAM])).slice(0,60);
+      if(csCands.length){
+        const cs=parseJSON(await askClaude("Eres experto en ventas de ferretería en Chile. Sugiere 3-6 complementarios para cross-selling. JSON sin markdown: [{\"sku\":\"...\",\"razon\":\"...\"}]",
+          `COMPRANDO:\n${matched.map(p=>`- ${p[P.DESC]} (${p[P.FAM]})`).join("\n")}\n\nDISPONIBLE:\n${csCands.map(p=>`SKU:${p[P.SKU]} | ${p[P.DESC]} | ${p[P.FAM]} | $${p[P.COSTO]}`).join("\n")}`));
+        if(cs)crossSell=cs.map(x=>{const prod=products.find(p=>p[P.SKU]===x.sku);return prod?{...x,p:prod}:null;}).filter(Boolean);
+      }
+    }
+
+    // Save history
+    const entry={id:Date.now(),fecha:new Date().toLocaleString("es-CL"),vendedor,input:clientText.substring(0,150),items:results.length,matched:results.filter(e=>e.alternativas.length>0).length};
+    hist=[entry,...hist].slice(0,50);
+    localStorage.setItem("ov_hist",JSON.stringify(hist));
+
+  }catch(err){console.error(err);alert("Error: "+err.message);}
+  busy=false;stepText="";render();
+}
+
+// ── Export XLSX ──
+async function exportXLSX(){
+  if(!results)return;
+  if(!window.XLSX){
+    const s=document.createElement("script");
+    s.src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js";
+    document.head.appendChild(s);
+    await new Promise(r=>{s.onload=r;s.onerror=()=>{alert("Error cargando librería Excel");r();}});
+  }
+  const X=window.XLSX;if(!X)return;
+  const wb=X.utils.book_new();const rows=[];
+  rows.push(["COTIZACIÓN FERRETERÍA OVIEDO"]);
+  rows.push(["Fecha:",new Date().toLocaleString("es-CL")]);
+  rows.push(["Vendedor:",vendedor]);
+  rows.push(["Cliente:",clienteNombre,"RUT:",clienteRut]);
+  if(clienteEmail)rows.push(["Email:",clienteEmail]);
+  if(clienteTelefono)rows.push(["Teléfono:",clienteTelefono]);
+  rows.push([]);
+  rows.push(["SKU","DESCRIPCIÓN","CANT.","COSTO","MARGEN %","P.NETO","DCTO %","DCTO $","TOTAL NETO"]);
+  let tN=0;
+  results.forEach((item,idx)=>{
+    item.alternativas.forEach((alt,ai)=>{
+      const key=idx+"-"+ai;
+      if(!selProd[key]||!alt.p)return;
+      const p=alt.p,m=getMargen(key),d=getDesc(key),dM=getDescM(key),cant=getCant(key,ai===0?(item.cantidad||1):1);
+      const cl=calcLine(p[P.COSTO],m,d,dM,cant);
+      tN+=cl.totalNeto;
+      rows.push([String(p[P.SKU]),p[P.DESC],cant,Math.round(p[P.COSTO]),m/100,cl.neto,d/100,cl.descMonto*cant,cl.totalNeto]);
+    });
+  });
+  // Manual products
+  manualProds.forEach((mp,mi)=>{const key="m-"+mi;if(selProd[key]===false)return;const p=mp.p,m=getMargen(key),d=getDesc(key),dM=getDescM(key),cant=getCant(key,mp.cant||1);const cl=calcLine(p[P.COSTO],m,d,dM,cant);tN+=cl.totalNeto;
+    rows.push([String(p[P.SKU]),p[P.DESC],cant,Math.round(p[P.COSTO]),m/100,cl.neto,d/100,cl.descMonto*cant,cl.totalNeto]);});
+  rows.push([]);rows.push(["","","","","","","","SUBTOTAL NETO:",tN]);
+  const selCS=crossSell.filter((_,i)=>selCross[i]);
+  let csTotal=0;
+  if(selCS.length){
+    rows.push([]);rows.push(["POTENCIA TU COMPRA CON ESTOS DESCUENTOS ESPECIALES"]);
+    rows.push(["SKU","DESCRIPCIÓN","CANT.","COSTO","MARGEN %","P.NETO","DCTO %","DCTO $","TOTAL NETO"]);
+    selCS.forEach(cs=>{const p=cs.p,ci=crossSell.indexOf(cs),m=getCsMargen(ci),d=getCsDesc(ci),dM=getCsDescM(ci),cant=getCsCant(ci);const cl=calcLine(p[P.COSTO],m,d,dM,cant);csTotal+=cl.totalNeto;
+      rows.push([String(p[P.SKU]),p[P.DESC],cant,Math.round(p[P.COSTO]),m/100,cl.neto,cl.descPct/100,cl.descMonto*cant,cl.totalNeto]);});
+    rows.push([]);rows.push(["","","","","","","","SUBTOTAL COMPLEMENTARIOS:",csTotal]);
+    rows.push(["","","","","","","","TOTAL GENERAL NETO:",tN+csTotal]);
+    rows.push(["","","","","","","","TOTAL GENERAL C/IVA:",Math.round((tN+csTotal)*(1+IVA))]);
+  }else{
+    rows.push(["","","","","","","","TOTAL C/IVA:",Math.round(tN*(1+IVA))]);
+  }
+  const ws=X.utils.aoa_to_sheet(rows);
+  ws["!cols"]=[{wch:14},{wch:42},{wch:6},{wch:12},{wch:10},{wch:14},{wch:8},{wch:12},{wch:14}];
+  X.utils.book_append_sheet(wb,ws,"Cotización");
+  X.writeFile(wb,`Cotizacion_Oviedo_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// ── Export PDF/HTML ──
+function downloadPrintHTML(){
+  const pd=buildPDFData();
+  const f=n=>`$${Math.round(n).toLocaleString("es-CL")}`;
+  const fecha=new Date().toLocaleDateString("es-CL",{day:"2-digit",month:"long",year:"numeric"});
+  const clienteHTML=`<div style="margin:16px 0;padding:12px 14px;background:#fafafa;border:1px solid #e5e5e5;border-radius:6px;font-size:11px;line-height:1.8"><b>Cliente:</b> ${clienteNombre} &nbsp;·&nbsp; <b>RUT:</b> ${clienteRut}${clienteEmail?" &nbsp;·&nbsp; <b>Email:</b> "+clienteEmail:""}${clienteTelefono?" &nbsp;·&nbsp; <b>Tel:</b> "+clienteTelefono:""}</div>`;
+  const prodRows=pd.items.map((it,i)=>`<tr style="background:${i%2===0?"#fff":"#fafafa"}"><td class="td mono" style="color:#666">${it.sku}</td><td class="td" style="font-weight:500">${it.desc}</td><td class="td c">${it.cant}</td><td class="td r">${f(it.netoUnit)}</td>${it.dcto>0?`<td class="td r" style="color:#FF0A00">${it.dcto}% (-${f(it.dctoMonto*it.cant)})</td>`:`<td class="td r" style="color:#999">-</td>`}<td class="td r b">${f(it.totalNeto)}</td></tr>`).join("");
+  const csHTML=pd.csItems.length?`<div style="margin-top:24px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div style="width:4px;height:18px;background:#FF0A00;border-radius:2px"></div><span style="font-size:13px;font-weight:800;letter-spacing:1px">&#128293; Potencia tu compra con estos descuentos especiales</span></div><table style="width:100%;border-collapse:collapse"><thead><tr><th class="th2">SKU</th><th class="th2">Descripción</th><th class="th2 c">Cant.</th><th class="th2 r">P. Neto</th><th class="th2 r">Dcto</th><th class="th2 r">Total Neto</th></tr></thead><tbody>${pd.csItems.map((cs,i)=>`<tr style="background:${i%2===0?"#fff":"#fafafa"}"><td class="td mono" style="color:#666">${cs.sku}</td><td class="td">${cs.desc}${cs.razon?'<div style="font-size:9px;color:#999;font-style:italic;margin-top:2px">'+cs.razon+'</div>':''}</td><td class="td c">${cs.cant}</td><td class="td r">${f(cs.netoUnit)}</td><td class="td r" style="color:${cs.dctoMonto>0?'#FF0A00':'#999'}">${cs.dctoMonto>0?cs.dcto+'% (-'+f(cs.dctoMonto*cs.cant)+')':'\u2014'}</td><td class="td r b">${f(cs.totalNeto)}</td></tr>`).join("")}</tbody></table><table style="width:100%;border-collapse:collapse"><tr style="background:#f5f5f5"><td style="padding:8px 10px;text-align:right;font-weight:600;color:#666;font-size:12px">Subtotal complementarios neto:</td><td style="padding:8px 10px;text-align:right;font-weight:700;font-size:13px;width:20%">${f(pd.csTotalNeto)}</td></tr>${pd.csTotalDcto>0?`<tr style="background:#f5f5f5"><td style="padding:5px 10px;text-align:right;font-size:11px;color:#FF0A00">Descuento complementarios:</td><td style="padding:5px 10px;text-align:right;font-size:11px;color:#FF0A00">-${f(pd.csTotalDcto)}</td></tr>`:``}</table></div>`:""  ;
+  const grandNeto=pd.totalNeto+pd.csTotalNeto;
+  const grandIva=Math.round(grandNeto*(1+IVA));
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Cotización Oviedo</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Helvetica Neue',Arial,sans-serif;max-width:800px;margin:0 auto;padding:0;color:#1a1a1a;-webkit-print-color-adjust:exact;print-color-adjust:exact}.td{padding:7px 10px;font-size:11px;border-bottom:1px solid #e5e5e5}.th{background:#000;color:#fff;padding:9px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;text-align:left}.th2{background:#333;color:#fff;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:left}.r{text-align:right}.c{text-align:center}.b{font-weight:700}.mono{font-family:'Courier New',monospace}@media print{body{padding:0}@page{margin:12mm 15mm}}</style></head><body><div style="padding:20px 28px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #FF0A00"><img src="${LOGO_B64}" style="height:100px"><div style="text-align:right;color:#666;font-size:11px;line-height:1.7"><div style="color:#000;font-weight:700;font-size:12px;letter-spacing:1px">COTIZACIÓN</div><div>${fecha}</div><div>Vendedor: <b>${vendedor||"—"}</b></div></div></div><div style="padding:20px 28px">${clienteHTML}<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px"><div><span style="display:inline-block;width:4px;height:18px;background:#FF0A00;border-radius:2px;vertical-align:middle;margin-right:8px"></span><span style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px">Detalle de Productos</span></div><span style="font-size:11px;color:#666">${pd.items.length} items</span></div><table style="width:100%;border-collapse:collapse;border:1px solid #e5e5e5"><thead><tr><th class="th" style="width:11%">SKU</th><th class="th">Descripción</th><th class="th c" style="width:6%">Cant.</th><th class="th r" style="width:12%">P. Neto</th><th class="th r" style="width:10%">Dcto</th><th class="th r" style="width:13%">Total Neto</th></tr></thead><tbody>${prodRows}</tbody></table><table style="width:100%;border-collapse:collapse"><tr style="background:#f5f5f5"><td style="padding:8px 10px;text-align:right;font-size:12px;font-weight:600;color:#666;width:75%">Subtotal productos neto:</td><td style="padding:8px 10px;text-align:right;font-size:13px;font-weight:700">${f(pd.totalNeto)}</td></tr>${pd.totalDcto>0?`<tr style="background:#f5f5f5"><td style="padding:5px 10px;text-align:right;font-size:11px;color:#FF0A00">Descuento productos:</td><td style="padding:5px 10px;text-align:right;font-size:11px;color:#FF0A00">-${f(pd.totalDcto)}</td></tr>`:``}</table>${csHTML}<table style="width:100%;border-collapse:collapse;margin-top:${pd.csItems.length?'8':'0'}px"><tr style="background:#f5f5f5"><td style="padding:8px 10px;text-align:right;font-size:12px;font-weight:600;color:#666;width:75%">Total Neto:</td><td style="padding:8px 10px;text-align:right;font-size:14px;font-weight:700">${f(grandNeto)}</td></tr><tr style="background:#f5f5f5"><td style="padding:6px 10px;text-align:right;font-size:11px;color:#666">IVA 19%:</td><td style="padding:6px 10px;text-align:right;font-size:12px;color:#666">${f(grandIva-grandNeto)}</td></tr><tr style="background:#FF0A00"><td style="padding:12px 14px;text-align:right;font-size:15px;font-weight:800;color:#fff;letter-spacing:1px">TOTAL c/IVA</td><td style="padding:12px 14px;text-align:right;font-size:20px;font-weight:900;color:#fff">${f(grandIva)}</td></tr></table><div style="margin-top:36px;padding-top:14px;border-top:3px solid #000;display:flex;justify-content:space-between"><div style="font-size:9px;color:#999;line-height:1.7"><div>Cotización válida por 7 días hábiles.</div><div>Precios sujetos a disponibilidad de stock.</div></div><div style="text-align:right"><div style="font-size:11px;font-weight:800;color:#FF0A00;letter-spacing:1px">WWW.OVIEDO.CL</div><div style="font-size:9px;color:#999;margin-top:2px">Santiago · Las Cabras · San Vicente · El Manzano · Litueche</div></div></div></div><div style="height:6px;background:#000"></div><div style="height:3px;background:#FF0A00"></div><script>window.onload=function(){window.print()}<\/script></body></html>`;
+  const blob=new Blob([html],{type:"text/html;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`Cotizacion_Oviedo_${new Date().toISOString().slice(0,10)}.html`;document.body.appendChild(a);a.click();setTimeout(()=>document.body.removeChild(a),100);
+}
+
+function buildPDFData(){
+  const items=[];let totalNeto=0,totalDcto=0;
+  results?.forEach((item,idx)=>{item.alternativas.forEach((alt,ai)=>{const key=idx+"-"+ai;if(!selProd[key]||!alt.p)return;const p=alt.p,m=getMargen(key),d=getDesc(key),dM=getDescM(key),cant=getCant(key,ai===0?(item.cantidad||1):1);const cl=calcLine(p[P.COSTO],m,d,dM,cant);totalNeto+=cl.totalNeto;totalDcto+=cl.descMonto*cant;items.push({sku:p[P.SKU],desc:p[P.DESC],cant,netoUnit:cl.neto,dcto:cl.descPct,dctoMonto:cl.descMonto,totalNeto:cl.totalNeto});});});
+  // Manual products
+  manualProds.forEach((mp,mi)=>{const key="m-"+mi;if(selProd[key]===false)return;const p=mp.p,m=getMargen(key),d=getDesc(key),dM=getDescM(key),cant=getCant(key,mp.cant||1);const cl=calcLine(p[P.COSTO],m,d,dM,cant);totalNeto+=cl.totalNeto;totalDcto+=cl.descMonto*cant;items.push({sku:p[P.SKU],desc:p[P.DESC],cant,netoUnit:cl.neto,dcto:cl.descPct,dctoMonto:cl.descMonto,totalNeto:cl.totalNeto});});
+  let csTotalNeto=0,csTotalDcto=0;
+  const csItems=crossSell.filter((_,i)=>selCross[i]).map(cs=>{const ci=crossSell.indexOf(cs),p=cs.p,m=getCsMargen(ci),d=getCsDesc(ci),dM=getCsDescM(ci),cant=getCsCant(ci);const cl=calcLine(p[P.COSTO],m,d,dM,cant);csTotalNeto+=cl.totalNeto;csTotalDcto+=cl.descMonto*cant;return{sku:p[P.SKU],desc:p[P.DESC],cant,netoUnit:cl.neto,dcto:cl.descPct,dctoMonto:cl.descMonto,totalNeto:cl.totalNeto,razon:cs.razon||""};});
+  return{items,csItems,totalNeto,totalDcto,totalIva:Math.round(totalNeto*(1+IVA)),csTotalNeto,csTotalDcto};
+}
+
+// ── Handle file/photo uploads ──
+async function handleClientFile(e){
+  const f=e.target.files[0];if(!f)return;
+  if(f.name.endsWith(".csv")||f.name.endsWith(".txt")){clientText=await f.text();render();return;}
+  busy=true;stepText="Leyendo archivo...";render();
+  const buf=await f.arrayBuffer();
+  const b64=btoa(new Uint8Array(buf).reduce((s,b)=>s+String.fromCharCode(b),""));
+  const extracted=await askClaude("Extrae todos los productos/items de este archivo. Lista cada producto en línea separada con toda la info. Responde SOLO la lista.",
+    [{type:"document",source:{type:"base64",media_type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",data:b64}},{type:"text",text:"Extrae los productos."}]);
+  clientText=extracted;busy=false;stepText="";render();
+}
+
+async function handlePhoto(e){
+  const f=e.target.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    photoPreview=ev.target.result;
+    const b64=ev.target.result.split(",")[1];
+    busy=true;stepText="Analizando imagen...";render();
+    const extracted=await askClaude("Esta imagen contiene productos de ferretería/construcción. Extrae TODOS, uno por línea, con cantidades. Responde SOLO la lista.",
+      [{type:"image",source:{type:"base64",media_type:f.type,data:b64}},{type:"text",text:"Extrae productos."}]);
+    clientText=extracted;busy=false;stepText="";render();
+  };
+  reader.readAsDataURL(f);
+}
+
+// ── Admin: update catalog ──
+async function updateCatalog(e){
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const text=await f.text();
+    const data=JSON.parse(text);
+    products=data;
+    localStorage.setItem("ov_prods",JSON.stringify(data));
+    localStorage.setItem("ov_prods_ver",new Date().toISOString());
+    alert(`✅ Catálogo actualizado: ${data.length} productos`);
+    showAdmin=false;render();
+  }catch(err){alert("Error: "+err.message);}
+}
+
+// ============================================
+// RENDER
+// ============================================
+function render(){
+  const app=document.getElementById("app");
+  
+  if(!products.length){
+    app.innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px">
+      <img src="${LOGO_B64}" style="height:100px">
+      <p style="color:var(--gray)">Cargando catálogo de productos...</p>
+      <div class="spinner" style="border-color:var(--border);border-top-color:var(--red);width:32px;height:32px;border-width:3px"></div>
+    </div>`;
+    return;
+  }
+
+  let h = `
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <img src="${LOGO_B64}" alt="Oviedo" style="height:55px">
+      <span class="badge">${products.length.toLocaleString()} SKUs</span>
+    </div>
+    <div class="header-right">
+      <input type="text" placeholder="Nombre vendedor" value="${vendedor}" onchange="vendedor=this.value;localStorage.setItem('ov_vendedor',this.value)" style="width:140px">
+      <button class="btn btn-ghost" onclick="showHist=!showHist;render()">📋 ${hist.length}</button>
+      <button class="btn btn-ghost" onclick="showAdmin=true;render()">⚙️</button>
+    </div>
+  </div>`;
+
+  // Historial
+  if(showHist){
+    h+=`<div style="padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);max-height:250px;overflow-y:auto">
+      <div style="font-weight:700;color:var(--red);margin-bottom:8px;font-size:13px">Historial de Cotizaciones</div>
+      ${hist.length?hist.map(x=>`<div class="hist-item"><span style="color:var(--gray)">${x.fecha}</span> · <span style="color:var(--red)">${x.vendedor||"—"}</span><br><span style="color:var(--gray)">${x.input}...</span> · ${x.items} items · ${x.matched} match</div>`).join(""):"<p style='color:var(--gray);font-size:13px'>Sin cotizaciones aún</p>"}
+    </div>`;
+  }
+
+  h+=`<div class="container">`;
+
+  // Input card
+  h+=`<div class="card">
+    <div class="tabs">
+      <button class="tab ${inputMode==='text'?'active':''}" onclick="inputMode='text';render()">✏️ Texto</button>
+      <button class="tab ${inputMode==='file'?'active':''}" onclick="inputMode='file';render()">📄 Archivo</button>
+      <button class="tab ${inputMode==='photo'?'active':''}" onclick="inputMode='photo';render()">📷 Foto</button>
+    </div>
+    <div class="card-body">`;
+
+  if(inputMode==="text"){
+    h+=`<textarea id="clientInput" rows="7" placeholder="Pega los requerimientos del cliente...\n\nEjemplo:\n- 2 sacos cemento 25kg\n- 10 tubos PVC 110mm\n- 1 taladro inalámbrico Dewalt" oninput="clientText=this.value;document.getElementById('btnCotizar').disabled=!this.value.trim()">${clientText}</textarea>`;
+  }else if(inputMode==="file"){
+    h+=`<div class="drop-area"><p style="margin-bottom:12px">Sube Excel o CSV del cliente</p><label class="btn btn-red">📁 Seleccionar<input type="file" accept=".xlsx,.xls,.csv,.txt" onchange="handleClientFile(event)" style="display:none"></label></div>`;
+    if(clientText)h+=`<textarea rows="5" style="margin-top:12px" oninput="clientText=this.value;document.getElementById('btnCotizar').disabled=!this.value.trim()">${clientText}</textarea>`;
+  }else{
+    h+=`<div class="drop-area">${photoPreview?`<img src="${photoPreview}" class="photo-preview">`:`<p style="margin-bottom:12px">Foto del listado del cliente</p>`}<label class="btn btn-red">📷 Seleccionar<input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="display:none"></label></div>`;
+    if(clientText)h+=`<textarea rows="5" style="margin-top:12px" oninput="clientText=this.value;document.getElementById('btnCotizar').disabled=!this.value.trim()">${clientText}</textarea>`;
+  }
+
+  h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:10px">
+    <div class="margen-ctrl"><label>Margen:</label><input type="number" dir="ltr" inputmode="decimal" value="${margen}" onchange="margen=+this.value;render()" min="0" max="80"><span style="color:var(--red);font-weight:700">%</span></div>
+    <button id="btnCotizar" class="btn btn-red" onclick="processQuote()" ${busy||!clientText.trim()?'disabled':''}>${busy?`<span class="spinner"></span><span class="step-text">${stepText}</span>`:'⚡ Cotizar'}</button>
+  </div></div></div>`;
+
+  // Results
+  if(results){
+    const matchCount=results.filter(r=>r.alternativas.length).length;
+    const noMatch=results.filter(r=>!r.alternativas.length).length;
+
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0;flex-wrap:wrap;gap:10px">
+      <div><span class="section-marker"></span><span style="font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:1px">Cotización</span></div>
+      <div style="display:flex;gap:20px">${[["Productos",results.length],["Match",matchCount],["Sin match",noMatch]].map(([l,n])=>`<div class="stat"><div class="stat-num">${n}</div><div class="stat-label">${l}</div></div>`).join("")}</div>
+    </div>`;
+
+    // Client data card
+    h+=`<div class="card"><div class="card-head"><span class="section-marker"></span>Datos del Cliente y Vendedor</div>
+      <div class="card-body"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">
+        <div><label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:3px">Nombre Cliente *</label><input type="text" value="${clienteNombre}" oninput="clienteNombre=this.value" placeholder="Nombre o razón social" style="width:100%"></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:3px">RUT *</label><input type="text" value="${clienteRut}" oninput="clienteRut=this.value" placeholder="12.345.678-9" style="width:100%"></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:3px">Email</label><input type="text" value="${clienteEmail}" oninput="clienteEmail=this.value" placeholder="correo@empresa.cl" style="width:100%"></div>
+        <div><label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:3px">Teléfono</label><input type="text" value="${clienteTelefono}" oninput="clienteTelefono=this.value" placeholder="+56 9 1234 5678" style="width:100%"></div>
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div><label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:3px">Vendedor *</label><input type="text" value="${vendedor}" oninput="vendedor=this.value;localStorage.setItem('ov_vendedor',this.value)" placeholder="Tu nombre" style="width:220px"></div>
+        <div class="margen-ctrl"><label>Margen base:</label><input type="number" dir="ltr" inputmode="decimal" value="${margen}" onchange="margen=+this.value;render()" min="0" max="80"><span style="color:var(--red);font-weight:700">%</span></div>
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:var(--gray)">* Campos obligatorios para generar PDF</div>
+    </div></div>`;
+
+    // Products table
+    const selRowCount=Object.values(selProd).filter(Boolean).length;
+    h+=`<div class="card" style="overflow-x:auto"><div class="card-head"><span><span class="section-marker"></span>Productos Cotizados</span><span style="color:var(--red);font-size:12px">${selRowCount} seleccionados</span></div><table style="min-width:1000px"><thead><tr>
+      <th>Producto Cliente</th><th style="width:55px">Cant</th><th>SKU</th><th>Descripción Oviedo</th><th class="r">Costo</th><th class="r" style="width:60px">Margen</th><th class="r">P.Neto</th><th class="r" style="width:55px">Dcto %</th><th class="r">Dcto $</th><th class="r">Total Neto</th>
+    </tr></thead><tbody>`;
+
+    let tCosto=0,tNeto=0,tDcto=0,tNetoFinal=0;
+    results.forEach((item,idx)=>{
+      if(!item.alternativas.length){
+        h+=`<tr class="no-match"><td>${item.cliente_item}</td><td colspan="9" style="color:var(--red);font-style:italic">⚠️ Sin coincidencia</td></tr>`;
+        return;
+      }
+      item.alternativas.forEach((alt,ai)=>{
+        const p=alt.p,key=idx+"-"+ai;
+        const isSel=!!selProd[key];
+        const m=getMargen(key),d=getDesc(key),dM=getDescM(key);
+        const cant=getCant(key,ai===0?(item.cantidad||1):1);
+        const cl=calcLine(p[P.COSTO],m,d,dM,cant);
+        if(isSel){tCosto+=p[P.COSTO]*cant;tNeto+=cl.neto*cant;tDcto+=cl.descMonto*cant;tNetoFinal+=cl.totalNeto;}
+        const confCls=`conf conf-${alt.confianza||"baja"}`;
+        h+=`<tr class="clickable" style="border-bottom:1px solid var(--border);${isSel?'background:#fff5f5;':''}transition:background .15s">
+          <td style="max-width:160px;cursor:pointer" onclick="selProd['${key}']=!selProd['${key}'];render()">${isSel?'<span style="color:var(--red);font-weight:700;margin-right:4px">✓</span>':''}${ai===0?item.cliente_item:'<span style="color:var(--gray)">↳ alt.</span>'} <span class="${confCls}" style="margin-left:2px">${alt.confianza||"?"}</span></td>
+          <td><input type="number" dir="ltr" inputmode="decimal" value="${cant}" onchange="rowCant['${key}']=+this.value;render()" onclick="event.stopPropagation()" min="1" style="width:45px;text-align:center;font-size:12px;padding:3px;border:1px solid var(--border);border-radius:4px"></td>
+          <td class="mono" style="color:var(--red);font-size:11px">${p[P.SKU]}</td>
+          <td style="max-width:200px;cursor:pointer" onclick="selProd['${key}']=!selProd['${key}'];render()">${p[P.DESC]}</td>
+          <td class="r" style="font-size:11px;color:var(--gray)">${fmt(p[P.COSTO])}</td>
+          <td class="r"><input type="number" dir="ltr" inputmode="decimal" value="${m}" onchange="rowMargen['${key}']=+this.value;render()" onclick="event.stopPropagation()" min="0" max="80" style="width:45px;text-align:center;font-size:12px;font-weight:700;color:var(--red);padding:3px;border:1px solid var(--border);border-radius:4px"></td>
+          <td class="r" style="font-size:11px">${fmt(cl.neto)}</td>
+          <td class="r"><input type="number" dir="ltr" inputmode="decimal" value="${Math.round(cl.descPct*10)/10}" onchange="rowDesc['${key}']=+this.value;delete rowDescM['${key}'];render()" onclick="event.stopPropagation()" min="0" max="99" style="width:42px;text-align:center;font-size:12px;padding:3px;border:1px solid var(--border);border-radius:4px"></td>
+          <td class="r"><input type="number" dir="ltr" inputmode="decimal" value="${cl.descMonto}" onchange="rowDescM['${key}']=+this.value;delete rowDesc['${key}'];render()" onclick="event.stopPropagation()" min="0" style="width:60px;text-align:center;font-size:11px;padding:3px;border:1px solid var(--border);border-radius:4px;color:${cl.descMonto>0?'var(--red)':'var(--gray)'}"></td>
+          <td class="r" style="font-weight:700">${fmt(cl.totalNeto)}</td>
+        </tr>`;
+      });
+    });
+
+    // Manual products rows
+    manualProds.forEach((mp,mi)=>{
+      const p=mp.p,key="m-"+mi;
+      const isSel=selProd[key]!==false;
+      const m=getMargen(key),d=getDesc(key),dM=getDescM(key);
+      const cant=getCant(key,mp.cant||1);
+      const cl=calcLine(p[P.COSTO],m,d,dM,cant);
+      if(isSel){tCosto+=p[P.COSTO]*cant;tNeto+=cl.neto*cant;tDcto+=cl.descMonto*cant;tNetoFinal+=cl.totalNeto;}
+      h+=`<tr style="border-bottom:1px solid var(--border);${isSel?'background:#f0fdf4;':''}transition:background .15s">
+        <td style="cursor:pointer" onclick="selProd['${key}']=selProd['${key}']===false?true:false;render()">${isSel?'<span style="color:#16a34a;font-weight:700;margin-right:4px">✓</span>':''}<span style="color:#16a34a;font-size:11px">+ agregado</span> <button onclick="event.stopPropagation();removeManualProduct(${mi})" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:11px;margin-left:4px" title="Eliminar">✕</button></td>
+        <td><input type="number" dir="ltr" inputmode="decimal" value="${cant}" onchange="rowCant['${key}']=+this.value;render()" onclick="event.stopPropagation()" min="1" style="width:45px;text-align:center;font-size:12px;padding:3px;border:1px solid var(--border);border-radius:4px"></td>
+        <td class="mono" style="color:#16a34a;font-size:11px">${p[P.SKU]}</td>
+        <td style="max-width:200px">${p[P.DESC]}</td>
+        <td class="r" style="font-size:11px;color:var(--gray)">${fmt(p[P.COSTO])}</td>
+        <td class="r"><input type="number" dir="ltr" inputmode="decimal" value="${m}" onchange="rowMargen['${key}']=+this.value;render()" onclick="event.stopPropagation()" min="0" max="80" style="width:45px;text-align:center;font-size:12px;font-weight:700;color:var(--red);padding:3px;border:1px solid var(--border);border-radius:4px"></td>
+        <td class="r" style="font-size:11px">${fmt(cl.neto)}</td>
+        <td class="r"><input type="number" dir="ltr" inputmode="decimal" value="${Math.round(cl.descPct*10)/10}" onchange="rowDesc['${key}']=+this.value;delete rowDescM['${key}'];render()" onclick="event.stopPropagation()" min="0" max="99" style="width:42px;text-align:center;font-size:12px;padding:3px;border:1px solid var(--border);border-radius:4px"></td>
+        <td class="r"><input type="number" dir="ltr" inputmode="decimal" value="${cl.descMonto}" onchange="rowDescM['${key}']=+this.value;delete rowDesc['${key}'];render()" onclick="event.stopPropagation()" min="0" style="width:60px;text-align:center;font-size:11px;padding:3px;border:1px solid var(--border);border-radius:4px;color:${cl.descMonto>0?'var(--red)':'var(--gray)'}"></td>
+        <td class="r" style="font-weight:700">${fmt(cl.totalNeto)}</td>
+      </tr>`;
+    });
+
+    // Add product search bar
+    h+=`<tr style="background:#f8fffe;border-bottom:1px solid var(--border)"><td colspan="10" style="padding:8px 10px;position:relative">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="color:#16a34a;font-weight:700;font-size:13px">+</span>
+        <input type="text" id="addProdSearch" value="${addSearch}" oninput="addSearch=this.value;addResults=quickSearch(this.value);updateSearchDropdown()" onkeydown="if(event.key==='Escape'){addSearch='';addResults=[];render()}" placeholder="Agregar producto: busca por SKU o descripción..." style="flex:1;border:1px solid #bbf7d0;background:#f0fdf4">
+        ${addSearch?`<button onclick="addSearch='';addResults=[];render()" style="border:none;background:none;color:var(--gray);cursor:pointer;font-size:14px">✕</button>`:''}
+      </div>
+      <div id="searchDropdown" style="position:absolute;left:10px;right:10px;top:42px;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px #0002;z-index:20;max-height:280px;overflow-y:auto;display:${addResults.length?'block':'none'}">
+        ${addResults.map(p=>`<div onclick="addManualProduct(products.find(x=>String(x[0])==='${String(p[P.SKU]).replace(/'/g,"\\'")}'))" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s;display:flex;justify-content:space-between;align-items:center" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='#fff'"><div><span class="mono" style="color:var(--red);font-size:11px;margin-right:8px">${p[P.SKU]}</span><span style="font-size:12px">${p[P.DESC]}</span><span style="font-size:10px;color:var(--gray);margin-left:8px">${p[P.MARCA]}</span></div><span style="font-size:12px;font-weight:600;white-space:nowrap">${fmt(p[P.COSTO])}</span></div>`).join("")}
+      </div>
+    </td></tr>`;
+
+    // Subtotal with weighted margin
+    const margenPond=tNetoFinal>0?Math.round((1-tCosto/tNetoFinal)*100):0;
+    h+=`<tr style="background:var(--lightgray)">
+      <td colspan="4" style="text-align:right;font-weight:700;color:var(--gray);padding:10px;font-size:12px">Subtotal productos:</td>
+      <td class="r" style="font-size:11px;color:var(--gray)">${fmt(tCosto)}</td>
+      <td class="r" style="font-weight:700;color:var(--red);font-size:12px">${margenPond}%</td>
+      <td class="r" style="font-size:11px">${fmt(tNeto)}</td>
+      <td></td>
+      <td class="r" style="font-size:11px;color:var(--red)">${tNeto>0?Math.round(tDcto/tNeto*1000)/10+'%':'-'}</td>
+      <td class="r" style="font-size:11px;color:var(--red)">${tDcto>0?'-'+fmt(tDcto):'-'}</td>
+      <td class="r" style="font-weight:800;font-size:13px">${fmt(tNetoFinal)}</td>
+    </tr>`;
+    h+=`</tbody></table></div>`;
+
+    // Cross-sell — same table format as products
+    if(crossSell.length){
+      const selCount=Object.values(selCross).filter(Boolean).length;
+      let csNetoTotal=0,csCosto=0,csNeto=0,csDcto=0;
+
+      h+=`<div class="card" style="overflow-x:auto"><div class="card-head" style="background:var(--lightgray)"><span><span class="section-marker"></span>🔥 Potencia tu compra con estos descuentos especiales</span><span style="color:var(--red);font-size:12px">${selCount} seleccionados</span></div>
+        <table style="min-width:1000px"><thead><tr>
+          <th>Descripción</th><th style="width:55px">Cant</th><th>SKU</th><th class="r">Costo</th><th class="r" style="width:60px">Margen</th><th class="r">P.Neto</th><th class="r" style="width:55px">Dcto %</th><th class="r">Dcto $</th><th class="r">Total Neto</th>
+        </tr></thead><tbody>`;
+      crossSell.forEach((cs,i)=>{
+        const isSel=!!selCross[i],p=cs.p;
+        const m=getCsMargen(i),d=getCsDesc(i),dM=getCsDescM(i),cant=getCsCant(i);
+        const cl=calcLine(p[P.COSTO],m,d,dM,cant);
+        if(isSel){csNetoTotal+=cl.totalNeto;csCosto+=p[P.COSTO]*cant;csNeto+=cl.neto*cant;csDcto+=cl.descMonto*cant;}
+        h+=`<tr class="clickable" style="${isSel?'background:#fff5f5;':''}border-bottom:1px solid var(--border);transition:background .15s">
+          <td style="cursor:pointer;max-width:220px" onclick="selCross[${i}]=!selCross[${i}];render()">${isSel?'<span style="color:var(--red);font-weight:700;margin-right:4px">✓</span>':''}<span style="font-size:12px;font-weight:500">${p[P.DESC]}</span>${cs.razon?'<div class="note" style="margin-top:2px">'+cs.razon+'</div>':''}</td>
+          <td><input type="number" dir="ltr" inputmode="decimal" value="${cant}" onchange="csCant[${i}]=+this.value;render()" onclick="event.stopPropagation()" min="1" style="width:45px;text-align:center;font-size:12px;padding:3px;border:1px solid var(--border);border-radius:4px"></td>
+          <td class="mono" style="color:var(--red);font-size:11px">${p[P.SKU]}</td>
+          <td class="r" style="font-size:11px;color:var(--gray)">${fmt(p[P.COSTO])}</td>
+          <td class="r"><input type="number" dir="ltr" inputmode="decimal" value="${m}" onchange="csMargen[${i}]=+this.value;render()" onclick="event.stopPropagation()" min="0" max="80" style="width:45px;text-align:center;font-size:12px;font-weight:700;color:var(--red);padding:3px;border:1px solid var(--border);border-radius:4px"></td>
+          <td class="r" style="font-size:11px">${fmt(cl.neto)}</td>
+          <td class="r"><input type="number" dir="ltr" inputmode="decimal" value="${Math.round(cl.descPct*10)/10}" onchange="csDesc[${i}]=+this.value;delete csDescM[${i}];render()" onclick="event.stopPropagation()" min="0" max="99" style="width:42px;text-align:center;font-size:12px;padding:3px;border:1px solid var(--border);border-radius:4px"></td>
+          <td class="r"><input type="number" dir="ltr" inputmode="decimal" value="${cl.descMonto}" onchange="csDescM[${i}]=+this.value;delete csDesc[${i}];render()" onclick="event.stopPropagation()" min="0" style="width:60px;text-align:center;font-size:11px;padding:3px;border:1px solid var(--border);border-radius:4px;color:${cl.descMonto>0?'var(--red)':'var(--gray)'}"></td>
+          <td class="r" style="font-weight:700">${fmt(cl.totalNeto)}</td>
+        </tr>`;
+      });
+      if(selCount>0){
+        const csDctoPct=csNeto>0?Math.round(csDcto/csNeto*1000)/10:0;
+        h+=`<tr style="background:var(--lightgray)">
+          <td colspan="3" style="text-align:right;font-weight:700;color:var(--gray);font-size:12px;padding:8px 10px">Subtotal complementarios:</td>
+          <td class="r" style="font-size:11px;color:var(--gray)">${fmt(csCosto)}</td><td></td>
+          <td class="r" style="font-size:11px">${fmt(csNeto)}</td>
+          <td class="r" style="font-size:11px;color:var(--red)">${csDctoPct}%</td>
+          <td class="r" style="font-size:11px;color:var(--red)">${csDcto>0?'-'+fmt(csDcto):'-'}</td>
+          <td class="r" style="font-weight:700">${fmt(csNetoTotal)}</td>
+        </tr>`;
+      }
+      h+=`</tbody></table></div>`;
+
+      // Grand total
+      if(selCount>0){
+        const grandNeto=tNetoFinal+csNetoTotal;
+        const grandCosto=tCosto+csCosto;
+        const grandIva=Math.round(grandNeto*(1+IVA));
+        const grandMargen=grandNeto>0?Math.round((1-grandCosto/grandNeto)*100):0;
+        h+=`<div class="card" style="border:2px solid var(--red)"><div style="padding:16px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+            <div><span style="font-weight:800;font-size:15px">TOTAL GENERAL</span><span style="font-size:12px;color:var(--gray);margin-left:8px">(productos + complementarios)</span></div>
+            <div style="display:flex;gap:24px;align-items:baseline">
+              <div><span style="font-size:11px;color:var(--gray)">Margen: </span><span style="font-weight:700;color:var(--red)">${grandMargen}%</span></div>
+              <div><span style="font-size:11px;color:var(--gray)">Neto: </span><span style="font-weight:700;font-size:16px">${fmt(grandNeto)}</span></div>
+              <div><span style="font-size:11px;color:var(--gray)">c/IVA: </span><span style="font-weight:900;font-size:22px;color:var(--red)">${fmt(grandIva)}</span></div>
+            </div>
+          </div>
+        </div></div>`;
+      }
+    }
+
+    // No cross-sell: show simple total
+    if(!crossSell.length||!Object.values(selCross).filter(Boolean).length){
+      const totalIva=Math.round(tNetoFinal*(1+IVA));
+      h+=`<div class="card" style="border:2px solid var(--red)"><div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div><span style="font-weight:800;font-size:15px">TOTAL</span></div>
+        <div style="display:flex;gap:24px;align-items:baseline">
+          <div><span style="font-size:11px;color:var(--gray)">Margen: </span><span style="font-weight:700;color:var(--red)">${margenPond}%</span></div>
+          <div><span style="font-size:11px;color:var(--gray)">Neto: </span><span style="font-weight:700;font-size:16px">${fmt(tNetoFinal)}</span></div>
+          <div><span style="font-size:11px;color:var(--gray)">c/IVA: </span><span style="font-weight:900;font-size:22px;color:var(--red)">${fmt(totalIva)}</span></div>
+        </div>
+      </div></div>`;
+    }
+
+    // Export buttons
+    h+=`<div class="export-bar">
+      <button class="btn btn-green" onclick="exportXLSX()">📥 Excel (selección)</button>
+      <button class="btn btn-red" onclick="if(!vendedor.trim()||!clienteNombre.trim()||!clienteRut.trim()){alert('Completa los campos obligatorios: Nombre Cliente, RUT y Vendedor');return;}showPDF=true;render()">📄 PDF Cotización</button>
+      <button class="btn btn-ghost" onclick="results=null;crossSell=[];clientText='';photoPreview=null;sel={};selCross={};selProd={};rowMargen={};rowDesc={};rowDescM={};rowCant={};csMargen={};csDesc={};csDescM={};csCant={};manualProds=[];addSearch='';addResults=[];render()">🔄 Nueva Cotización</button>
+    </div>`;
+  } // close if(results)
+
+  h+=`</div>`; // close container
+
+  // Admin overlay
+  if(showAdmin){
+    const ver=localStorage.getItem("ov_prods_ver")||"nunca";
+    h+=`<div class="admin-overlay" onclick="showAdmin=false;render()">
+      <div class="admin-panel" onclick="event.stopPropagation()">
+        <h3 style="margin-bottom:16px;font-size:16px">⚙️ Configuración</h3>
+        <div style="margin-bottom:16px;padding:16px;background:var(--lightgray);border-radius:8px">
+          <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px">📦 Actualizar Catálogo</label>
+          <div style="font-size:12px;color:var(--gray);margin-bottom:8px">Productos actuales: <b>${products.length.toLocaleString()}</b> · Última actualización: <b>${ver.slice(0,10)}</b></div>
+          <label class="btn btn-black" style="font-size:13px">📁 Subir nuevo JSON<input type="file" accept=".json" onchange="updateCatalog(event)" style="display:none"></label>
+        </div>
+        <button class="btn btn-ghost" onclick="showAdmin=false;render()" style="width:100%">Cerrar</button>
+      </div>
+    </div>`;
+  }
+
+  // PDF overlay
+  if(showPDF){
+    const pd=buildPDFData();
+    const fecha=new Date().toLocaleDateString("es-CL",{day:"2-digit",month:"long",year:"numeric"});
+    const grandNeto=pd.totalNeto+pd.csTotalNeto;
+    const grandIva=Math.round(grandNeto*(1+IVA));
+    h+=`<div class="pdf-overlay">
+      <div class="pdf-toolbar">
+        <span style="font-weight:700;font-size:13px">Vista previa de Cotización</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-red" onclick="downloadPrintHTML()">📄 Descargar</button>
+          <button class="btn btn-black" onclick="showPDF=false;render()">← Volver</button>
+        </div>
+      </div>
+      <div class="pdf-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:3px solid var(--red)">
+          <img src="${LOGO_B64}" style="height:75px">
+          <div style="text-align:right;color:var(--gray);font-size:11px;line-height:1.7">
+            <div style="color:#000;font-weight:700;font-size:12px;letter-spacing:1px">COTIZACIÓN</div>
+            <div>${fecha}</div><div>Vendedor: <b>${vendedor||"—"}</b></div>
+          </div>
+        </div>
+        <div style="margin:16px 0;padding:12px 14px;background:var(--lightgray);border:1px solid var(--border);border-radius:6px;font-size:11px;line-height:1.8"><b>Cliente:</b> ${clienteNombre} · <b>RUT:</b> ${clienteRut}${clienteEmail?" · <b>Email:</b> "+clienteEmail:""}${clienteTelefono?" · <b>Tel:</b> "+clienteTelefono:""}</div>
+        <div style="margin:16px 0 10px"><span class="section-marker"></span><span style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px">Detalle de Productos</span><span style="float:right;font-size:11px;color:var(--gray)">${pd.items.length} items</span></div>
+        <table style="border:1px solid var(--border)"><thead><tr><th style="width:11%">SKU</th><th>Descripción</th><th class="c" style="width:6%">Cant.</th><th class="r" style="width:12%">P. Neto</th><th class="r" style="width:10%">Dcto</th><th class="r" style="width:13%">Total Neto</th></tr></thead><tbody>
+        ${pd.items.map((it,i)=>`<tr style="background:${i%2===0?"#fff":"#fafafa"}"><td class="mono" style="color:var(--gray)">${it.sku}</td><td style="font-weight:500">${it.desc}</td><td class="c">${it.cant}</td><td class="r">${fmt(it.netoUnit)}</td><td class="r" style="color:${it.dcto>0?"var(--red)":"#999"}">${it.dcto>0?it.dcto+"% (-"+fmt(it.dctoMonto*it.cant)+")":"-"}</td><td class="r" style="font-weight:700">${fmt(it.totalNeto)}</td></tr>`).join("")}
+        </tbody></table>
+        <table><tr style="background:var(--lightgray)"><td style="text-align:right;font-weight:600;color:var(--gray);width:75%;padding:8px 10px;font-size:12px">Subtotal productos neto:</td><td style="text-align:right;font-weight:700;padding:8px 10px;font-size:13px">${fmt(pd.totalNeto)}</td></tr>${pd.totalDcto>0?`<tr style="background:var(--lightgray)"><td style="text-align:right;font-size:11px;color:var(--red);padding:5px 10px">Descuento productos:</td><td style="text-align:right;font-size:11px;color:var(--red);padding:5px 10px">-${fmt(pd.totalDcto)}</td></tr>`:``}</table>
+        ${pd.csItems.length?`<div style="margin-top:24px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div style="width:4px;height:18px;background:var(--red);border-radius:2px"></div><span style="font-size:13px;font-weight:800;letter-spacing:1px">🔥 Potencia tu compra con estos descuentos especiales</span></div><table><thead><tr><th style="background:#333">SKU</th><th style="background:#333">Descripción</th><th class="c" style="background:#333">Cant.</th><th class="r" style="background:#333">P. Neto</th><th class="r" style="background:#333">Dcto</th><th class="r" style="background:#333">Total Neto</th></tr></thead><tbody>${pd.csItems.map((cs,i)=>`<tr style="background:${i%2===0?"#fff":"#fafafa"}"><td class="mono" style="color:var(--gray)">${cs.sku}</td><td>${cs.desc}${cs.razon?'<div style="font-size:9px;color:#999;font-style:italic;margin-top:2px">'+cs.razon+'</div>':''}</td><td class="c">${cs.cant}</td><td class="r">${fmt(cs.netoUnit||cs.pN)}</td><td class="r" style="color:${cs.dctoMonto>0?'var(--red)':'#999'}">${cs.dctoMonto>0?cs.dcto+'% (-'+fmt(cs.dctoMonto*cs.cant)+')':"-"}</td><td class="r" style="font-weight:600">${fmt(cs.totalNeto)}</td></tr>`).join("")}</tbody></table><table><tr style="background:var(--lightgray)"><td style="text-align:right;font-weight:600;color:var(--gray);width:75%;padding:8px 10px;font-size:12px">Subtotal complementarios neto:</td><td style="text-align:right;font-weight:700;padding:8px 10px;font-size:13px">${fmt(pd.csTotalNeto)}</td></tr>${pd.csTotalDcto>0?`<tr style="background:var(--lightgray)"><td style="text-align:right;font-size:11px;color:var(--red);padding:5px 10px">Descuento complementarios:</td><td style="text-align:right;font-size:11px;color:var(--red);padding:5px 10px">-${fmt(pd.csTotalDcto)}</td></tr>`:``}</table></div>`:""}
+        <table style="margin-top:8px"><tr style="background:var(--lightgray)"><td style="text-align:right;font-weight:700;color:var(--gray);width:75%;padding:8px 10px;font-size:12px">Total Neto:</td><td style="text-align:right;font-weight:700;padding:8px 10px;font-size:14px">${fmt(grandNeto)}</td></tr>
+        <tr style="background:var(--lightgray)"><td style="text-align:right;font-size:11px;color:var(--gray);padding:6px 10px">IVA 19%:</td><td style="text-align:right;font-size:12px;color:var(--gray);padding:6px 10px">${fmt(grandIva-grandNeto)}</td></tr>
+        <tr style="background:var(--red)"><td style="text-align:right;font-weight:800;color:#fff;letter-spacing:1px;padding:12px 14px;font-size:15px">TOTAL c/IVA</td><td style="text-align:right;font-weight:900;color:#fff;font-size:20px;padding:12px 14px">${fmt(grandIva)}</td></tr></table>
+        <div style="margin-top:36px;padding-top:14px;border-top:3px solid #000;display:flex;justify-content:space-between">
+          <div style="font-size:9px;color:#999;line-height:1.7">Cotización válida por 7 días hábiles.<br>Precios sujetos a disponibilidad de stock.</div>
+          <div style="text-align:right"><div style="font-size:11px;font-weight:800;color:var(--red);letter-spacing:1px">WWW.OVIEDO.CL</div><div style="font-size:9px;color:#999;margin-top:2px">Santiago · Las Cabras · San Vicente · El Manzano · Litueche</div></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  app.innerHTML=h;
+}
+
+// ── Init ──
+loadProducts();
+</script>
+</body>
+</html>
