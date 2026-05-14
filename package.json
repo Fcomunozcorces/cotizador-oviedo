@@ -1,9 +1,0 @@
-{
-  "name": "cotizador-oviedo",
-  "version": "1.2.0",
-  "private": true,
-  "description": "Cotizador inteligente Ferretería Oviedo",
-  "dependencies": {
-    "@netlify/blobs": "^8.1.0"
-  }
-}
